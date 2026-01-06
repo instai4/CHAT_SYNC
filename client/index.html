@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatSync 💬 - Real-Time Chat</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="/manifest.json">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-comments"></i>
+                    <h1>ChatSync</h1>
+                </div>
+                <div class="status">
+                    <span class="status-indicator" id="statusIndicator"></span>
+                    <span id="connectionStatus">Connecting...</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Sidebar - User List -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <h2><i class="fas fa-users"></i> Online Users</h2>
+                    <span class="user-count" id="userCount">0</span>
+                </div>
+                <div class="user-list" id="userList">
+                    <div class="user-item placeholder">
+                        <div class="user-avatar" style="background-color: #ccc;"></div>
+                        <div class="user-info">
+                            <span class="user-name">No users online</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="current-user" id="currentUserContainer">
+                    <div class="user-item">
+                        <div class="user-avatar" id="currentUserAvatar"></div>
+                        <div class="user-info">
+                            <span class="user-name" id="currentUserName">You</span>
+                            <span class="user-status">Online</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Chat Area -->
+            <main class="chat-container">
+                <!-- Welcome/Join Screen -->
+                <div class="welcome-screen" id="welcomeScreen">
+                    <div class="welcome-content">
+                        <div class="welcome-icon">
+                            <i class="fas fa-comment-dots"></i>
+                        </div>
+                        <h2>Welcome to ChatSync</h2>
+                        <p>Join the conversation in real-time with users around the world</p>
+                        
+                        <div class="join-form">
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="usernameInput" placeholder="Enter your username" maxlength="20" autocomplete="off">
+                            </div>
+                            <button id="joinButton" class="btn-primary">
+                                <i class="fas fa-sign-in-alt"></i> Join Chat
+                            </button>
+                        </div>
+                        
+                        <div class="features">
+                            <div class="feature">
+                                <i class="fas fa-bolt"></i>
+                                <span>Real-time messaging</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-user-friends"></i>
+                                <span>See who's online</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-typing"></i>
+                                <span>Typing indicators</span>
+                            </div>
+                            <div class="feature">
+                                <i class="fas fa-palette"></i>
+                                <span>Personal colors</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Area (hidden initially) -->
+                <div class="chat-area" id="chatArea" style="display: none;">
+                    <!-- Messages Container -->
+                    <div class="messages-container" id="messagesContainer">
+                        <!-- Messages will be inserted here -->
+                    </div>
+
+                    <!-- Typing Indicator -->
+                    <div class="typing-indicator" id="typingIndicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+
+                    <!-- Message Input -->
+                    <div class="message-input-container">
+                        <div class="input-wrapper">
+                            <button class="btn-icon" id="emojiButton">
+                                <i class="far fa-smile"></i>
+                            </button>
+                            <input type="text" id="messageInput" placeholder="Type your message here..." autocomplete="off" disabled>
+                            <button class="btn-icon" id="sendButton" disabled>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="input-hint">
+                            Press <kbd>Enter</kbd> to send, <kbd>Shift+Enter</kbd> for new line
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>ChatSync 💬 - Real-time chat application | Built with WebSockets</p>
+            <p class="footer-info">Connected to: <span id="serverAddress">localhost:8080</span></p>
+        </footer>
+    </div>
+
+    <!-- Notification Sound -->
+    <audio id="notificationSound" preload="auto">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" type="audio/mpeg">
+    </audio>
+
+    <script src="script.js"></script>
+</body>
+</html>

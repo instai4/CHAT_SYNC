@@ -1,0 +1,31 @@
+{
+  "name": "chatsync-server",
+  "version": "1.0.0",
+  "description": "Real-time chat application server",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "build": "echo 'Building for production...'",
+    "render-build": "echo 'Render build complete'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "chat",
+    "realtime",
+    "websocket",
+    "nodejs"
+  ],
+  "author": "ChatSync Team",
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.14.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
