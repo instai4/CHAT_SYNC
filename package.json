@@ -6,8 +6,6 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "echo 'Building for production...'",
-    "render-build": "echo 'Render build complete'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

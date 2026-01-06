@@ -4,37 +4,27 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-// Get client path - handles different environments
 // Determine client path based on environment
 let CLIENT_PATH;
-if (fs.existsSync(path.join(__dirname, 'client', 'index.html'))) {
-  // Client folder is in same directory as server.js
-  CLIENT_PATH = path.join(__dirname, 'client');
-} else if (fs.existsSync(path.join(__dirname, '../client', 'index.html'))) {
-  // Client folder is in parent directory
-  CLIENT_PATH = path.join(__dirname, '../client');
-} else {
-  // Default to current directory
-  CLIENT_PATH = __dirname;
+const possiblePaths = [
+    path.join(__dirname, 'client'),          // Client folder in same directory
+    path.join(__dirname, '../client'),       // Client folder in parent directory
+    path.join(__dirname, '..', 'client'),    // Alternative parent path
+    __dirname                                // Current directory as fallback
+];
+
+for (const clientPath of possiblePaths) {
+    if (fs.existsSync(path.join(clientPath, 'index.html'))) {
+        CLIENT_PATH = clientPath;
+        console.log(`Found client files at: ${CLIENT_PATH}`);
+        break;
+    }
 }
-console.log(`Client files path: ${CLIENT_PATH}`);
 
-
-// Create HTTP server for serving client files
-const server = http.createServer((req, res) => {
-  // Security: Prevent directory traversal
-  const sanitizedUrl = req.url.split('?')[0].split('#')[0];
-  const normalizedUrl = path.normalize(sanitizedUrl).replace(/^(\.\.[\/\\])+/, '');
-  
-  // Default to index.html for root or non-file requests
-  let filePath = normalizedUrl === '/' || !path.extname(normalizedUrl) 
-    ? path.join(CLIENT_PATH, 'index.html')
-    : path.join(CLIENT_PATH, normalizedUrl);
-  
-  // Ensure file is within client directory
-  if (!filePath.startsWith(CLIENT_PATH)) {
-    filePath = path.join(CLIENT_PATH, 'index.html');
-  }
+if (!CLIENT_PATH) {
+    console.log('Warning: Client folder not found, using current directory');
+    CLIENT_PATH = __dirname;
+}
   
   const extname = path.extname(filePath).toLowerCase();
   
@@ -101,7 +91,6 @@ const server = http.createServer((req, res) => {
       res.end(content, 'utf-8');
     }
   });
-});
 
 // Create WebSocket server
 const wss = new WebSocket.Server({ 

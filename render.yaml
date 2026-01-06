@@ -3,7 +3,7 @@ services:
     name: chatsync
     env: node
     buildCommand: npm install
-    startCommand: npm start
+    startCommand: node server.js
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
