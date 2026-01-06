@@ -2,10 +2,12 @@ services:
   - type: web
     name: chatsync
     env: node
-    buildCommand: npm install
-    startCommand: node server.js
+    buildCommand: npm ci --legacy-peer-deps
+    startCommand: npm start
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
         value: production
+      - key: NPM_CONFIG_LEGACY_PEER_DEPS
+        value: true
     autoDeploy: true
