@@ -4,28 +4,29 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-// Determine client path based on environment
-let CLIENT_PATH;
-const possiblePaths = [
-    path.join(__dirname, 'client'),          // Client folder in same directory
-    path.join(__dirname, '../client'),       // Client folder in parent directory
-    path.join(__dirname, '..', 'client'),    // Alternative parent path
-    __dirname                                // Current directory as fallback
-];
+// Simple client path - client folder is in same directory
+const CLIENT_PATH = path.join(__dirname, 'client');
 
-for (const clientPath of possiblePaths) {
-    if (fs.existsSync(path.join(clientPath, 'index.html'))) {
-        CLIENT_PATH = clientPath;
-        console.log(`Found client files at: ${CLIENT_PATH}`);
-        break;
-    }
+// Check if client folder exists
+if (!fs.existsSync(CLIENT_PATH)) {
+  console.warn('Warning: Client folder not found at:', CLIENT_PATH);
+  console.warn('Current directory:', __dirname);
 }
 
-if (!CLIENT_PATH) {
-    console.log('Warning: Client folder not found, using current directory');
-    CLIENT_PATH = __dirname;
-}
+// Create HTTP server for serving client files
+const server = http.createServer((req, res) => {
+  // Security: Prevent directory traversal
+  let requestPath = req.url.split('?')[0].split('#')[0];
   
+  // Default to index.html for root
+  if (requestPath === '/') {
+    requestPath = '/index.html';
+  }
+  
+  // Build file path
+  const filePath = path.join(CLIENT_PATH, requestPath);
+  
+  // Get file extension
   const extname = path.extname(filePath).toLowerCase();
   
   // Set content type
@@ -50,7 +51,7 @@ if (!CLIENT_PATH) {
     '.eot': 'application/vnd.ms-fontobject'
   };
   
-  let contentType = contentTypes[extname] || 'application/octet-stream';
+  const contentType = contentTypes[extname] || 'application/octet-stream';
   
   // Read and serve the file
   fs.readFile(filePath, (error, content) => {
@@ -75,28 +76,18 @@ if (!CLIENT_PATH) {
         res.end(`Server Error: ${error.code}`, 'utf-8');
       }
     } else {
-      // Success - set headers
-      const headers = {
+      // Success
+      res.writeHead(200, { 
         'Content-Type': contentType,
-        'Cache-Control': extname === '.html' ? 'no-cache' : 'public, max-age=86400',
-        'X-Content-Type-Options': 'nosniff'
-      };
-      
-      // Add CORS headers for API routes
-      if (process.env.NODE_ENV !== 'production') {
-        headers['Access-Control-Allow-Origin'] = '*';
-      }
-      
-      res.writeHead(200, headers);
+        'Cache-Control': extname === '.html' ? 'no-cache' : 'public, max-age=86400'
+      });
       res.end(content, 'utf-8');
     }
   });
+});
 
 // Create WebSocket server
-const wss = new WebSocket.Server({ 
-  server,
-  clientTracking: true
-});
+const wss = new WebSocket.Server({ server });
 
 // Store connected clients and users
 const clients = new Map();
@@ -188,7 +179,7 @@ wss.on('connection', (ws, req) => {
       switch (message.type) {
         case 'join':
           // User is joining with a username
-          const username = message.username ? message.username.trim() : '';
+          const username = message.username.trim();
           
           // Validate username
           if (!username || username.length < 1 || username.length > 20) {
@@ -407,18 +398,14 @@ server.on('error', (error) => {
 
 // Start server
 const PORT = process.env.PORT || 8080;
-const HOST = process.env.HOST || '0.0.0.0';
-
-server.listen(PORT, HOST, () => {
-  console.log(`╔═══════════════════════════════════════════════════╗`);
-  console.log(`║             ChatSync Server Running              ║`);
-  console.log(`╠═══════════════════════════════════════════════════╣`);
-  console.log(`║ Port: ${PORT}                                        ║`);
-  console.log(`║ Host: ${HOST}                                        ║`);
-  console.log(`║ Environment: ${process.env.NODE_ENV || 'development'} ║`);
-  console.log(`║ URL: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT} ║`);
-  console.log(`║ WebSocket: ws://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT} ║`);
-  console.log(`╚═══════════════════════════════════════════════════╝`);
+server.listen(PORT, () => {
+  console.log(`╔════════════════════════════════════════╗`);
+  console.log(`║         ChatSync Server Running      ║`);
+  console.log(`╠════════════════════════════════════════╣`);
+  console.log(`║ Port: ${PORT}                              ║`);
+  console.log(`║ URL: http://localhost:${PORT}              ║`);
+  console.log(`║ WebSocket: ws://localhost:${PORT}          ║`);
+  console.log(`╚════════════════════════════════════════╝`);
   console.log(`\n📡 Server is ready for connections...`);
 });
 
